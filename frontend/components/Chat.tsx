@@ -43,6 +43,10 @@ export default function Chat() {
                     key={idx}
                     className="badge"
                     title={c.section || ''}
+                    onClick={() => {
+                      const el = document.getElementById(`chunk-${idx}`);
+                      el?.scrollIntoView({ behavior: 'smooth' });
+                    }}
                     style={{
                       padding: '4px 8px',
                       borderRadius: 6,
@@ -60,7 +64,7 @@ export default function Chat() {
               <details style={{marginTop:6}}>
                 <summary>View supporting chunks</summary>
                 {m.chunks.map((c, idx) => (
-                  <div key={idx} className="card">
+                  <div id={`chunk-${idx}`} key={idx} className="card">
                     <div style={{fontWeight:600}}>{c.title}{c.section ? ' — ' + c.section : ''}</div>
                     <div style={{whiteSpace:'pre-wrap'}}>{c.text}</div>
                   </div>
