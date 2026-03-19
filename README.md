@@ -303,26 +303,31 @@ frontend/
 
 ---
 
-## 🔥 4. Evaluation pipeline
+## 🔥 5. Evaluation pipeline
 
 * Automated accuracy testing on known queries
 
 ---
 
-## 🔥 5. Caching Layer
+## 🔥 6. Multi model testing
+
+* Test with diffrent models and choose the model with better overall accuracy or even combine different models if feasible for better accuracy 
+
+
+## 🔥 7. Caching Layer
 
 * Cache embeddings + answers
 * Reduce latency & cost
 
 ---
 
-## 🔥 6. Semantic Chunking
+## 🔥 8. Semantic Chunking
 
 * Split by meaning instead of length
 
 ---
 
-## 🔥 7. Observability
+## 🔥 9. Observability
 
 * Logging:
 
@@ -332,7 +337,7 @@ frontend/
 
 ---
 
-## 🔥 8. CI/CD Pipeline
+## 🔥 10. CI/CD Pipeline
 
 * GitHub Actions:
 
