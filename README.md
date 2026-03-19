@@ -16,18 +16,23 @@ A Retrieval-Augmented Generation (RAG) system that answers company policy and pr
 
 ---
 
-# 🏗️ Architecture
+## 🏗️ Architecture
 
-```
-Frontend (Next.js)
-        ↓
-FastAPI Backend (RAG Engine)
-        ↓
-Embedding Model (SentenceTransformers)
-        ↓
-Vector Store (Qdrant or In-Memory)
-        ↓
-LLM (OpenRouter or Stub)
+```text
+User (Next.js UI)
+   ↓
+FastAPI Backend (/api/ask)
+   ↓
+RAG Engine
+   ├─ Query Expansion
+   ├─ Embedding (MiniLM)
+   ├─ Retrieval (Qdrant / Memory)
+   ├─ Hybrid Ranking (vector + keyword)
+   ├─ Filtering + Deduplication
+   ↓
+LLM (OpenRouter / Stub)
+   ↓
+Answer + Citations + Supporting Chunks
 ```
 
 ---
@@ -141,6 +146,13 @@ Example:
 ```text
 Can a customer return a damaged blender after 20 days?
 ```
+
+---
+
+## 4. 🔐 Environment Variables
+
+- Copy `.env.example` → `.env`
+- Do NOT commit `.env` (contains API keys)
 
 ---
 
@@ -291,20 +303,31 @@ frontend/
 
 ---
 
-## 🔥 5. Caching Layer
+## 🔥 5. Evaluation pipeline
+
+* Automated accuracy testing on known queries
+
+---
+
+## 🔥 6. Multi model testing
+
+* Test with diffrent models and choose the model with better overall accuracy or even combine different models if feasible for better accuracy 
+
+
+## 🔥 7. Caching Layer
 
 * Cache embeddings + answers
 * Reduce latency & cost
 
 ---
 
-## 🔥 6. Semantic Chunking
+## 🔥 8. Semantic Chunking
 
 * Split by meaning instead of length
 
 ---
 
-## 🔥 7. Observability
+## 🔥 9. Observability
 
 * Logging:
 
@@ -314,7 +337,7 @@ frontend/
 
 ---
 
-## 🔥 8. CI/CD Pipeline
+## 🔥 10. CI/CD Pipeline
 
 * GitHub Actions:
 
