@@ -333,7 +333,7 @@ class RAGEngine:
 
         # fallback if empty
         if not filtered:
-            filtered = ranked[:2]
+            return []
 
         return filtered[:3]
     
@@ -364,6 +364,8 @@ class RAGEngine:
 
         contexts = top + rest
         contexts = contexts[:2]
+        if not contexts:
+            return "Not specified in the policy."
         answer = self.llm.generate(query, contexts)
         self.metrics.add_generation((time.time()-t0)*1000.0)
         return answer
