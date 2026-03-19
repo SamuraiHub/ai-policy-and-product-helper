@@ -124,7 +124,10 @@ class OpenRouterLLM:
         - DO NOT rephrase into new meanings
         - Prefer quoting or closely paraphrasing source wording
         - You may combine multiple sources
+        - If the question is about products, list them clearly with name, price, and availability
         - Avoid introducing new terms not present in sources
+        - DO NOT make absolute claims unless explicitly stated.
+        - If conditions exist, always express them conditionally.
         - DO NOT include citations in the answer
         - Citations will be added separately
 
@@ -228,18 +231,15 @@ class RAGEngine:
         q = query.lower()
         text = (m.get("title", "") + " " + m.get("text", "")).lower()
 
-        # ❌ Block obvious noise
-        if "catalog" in m.get("title", "").lower():
-            return False
+        # allow catalog for product-related queries
+        if "catalog" in m.get("title", "").lower(): 
+            return any(k in query.lower() for k in ["product", "catalog", "sku", "price"])
 
         query_terms = set(q.split())
 
         overlap = sum(1 for t in query_terms if t in text)
 
-        # 🔥 Require BOTH:
-        # 1. keyword overlap
-        # 2. semantic relevance (from vector score)
-        return overlap >= 2 and m.get("_score", 0) > 0.3
+        return overlap >= 1 or m.get("_score", 0) > 0.35
     
     def expand_query(self, q: str) -> str:
         synonyms = {
@@ -256,6 +256,20 @@ class RAGEngine:
                 extra.append(v)
 
         return q + " " + " ".join(extra)
+    
+    def detect_intent(self, query: str) -> str:
+        q = query.lower()
+
+        if any(k in q for k in ["product", "catalog", "sku", "price", "available"]):
+            return "product"
+
+        if any(k in q for k in ["ship", "delivery", "sla"]):
+            return "shipping"
+
+        if any(k in q for k in ["return", "refund", "warranty", "damage", "defect"]):
+            return "policy"
+
+        return "general"
 
     def retrieve(self, query: str, k: int = 40) -> List[Dict]:
         t0 = time.time()
@@ -294,9 +308,34 @@ class RAGEngine:
 
         self.metrics.add_retrieval((time.time()-t0)*1000.0)
 
-        filtered = [m for m in ranked if self.is_relevant(m, query)]
+        intent = self.detect_intent(query)
 
-        return filtered[:4]
+        if intent == "product":
+            filtered = [
+                m for m in ranked
+                if "catalog" in m.get("title", "").lower()
+            ]
+
+        elif intent == "shipping":
+            filtered = [
+                m for m in ranked
+                if "shipping" in m.get("title", "").lower()
+            ]
+
+        elif intent == "policy":
+            filtered = [
+                m for m in ranked
+                if any(k in m.get("title","").lower() for k in ["returns", "warranty"])
+            ]
+
+        else:
+            filtered = ranked
+
+        # fallback if empty
+        if not filtered:
+            filtered = ranked[:2]
+
+        return filtered[:3]
     
     def dedupe_for_llm(self, contexts):
         seen = set()
@@ -324,6 +363,7 @@ class RAGEngine:
         ]
 
         contexts = top + rest
+        contexts = contexts[:2]
         answer = self.llm.generate(query, contexts)
         self.metrics.add_generation((time.time()-t0)*1000.0)
         return answer

@@ -57,8 +57,8 @@ def ask(req: AskRequest):
     seen = set()
     citations = []
 
-    for c in ctx:
-        key = (c.get("title"), c.get("section"))
+    for c in unique_ctx:
+        key = c.get("title")
         if key in seen:
             continue
         seen.add(key)
