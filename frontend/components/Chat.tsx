@@ -30,10 +30,26 @@ export default function Chat() {
     <div className="card">
       <h2>Chat</h2>
       <div style={{maxHeight: 320, overflowY:'auto', padding: 8, border:'1px solid #eee', borderRadius: 8, marginBottom: 12}}>
+        {messages.length === 0 && (
+          <div style={{ color: '#777', fontSize: 14 }}>
+            Ask a question about policies or products…
+          </div>
+        )}
         {messages.map((m, i) => (
           <div key={i} style={{margin: '8px 0'}}>
             <div style={{fontSize:12, color:'#666'}}>{m.role === 'user' ? 'You' : 'Assistant'}</div>
-            <div>{m.content}</div>
+            <div
+            style={{
+              background: m.role === 'user' ? '#111' : '#f3f4f6',
+              color: m.role === 'user' ? '#fff' : '#111',
+              padding: 10,
+              borderRadius: 10,
+              maxWidth: '80%',
+              marginLeft: m.role === 'user' ? 'auto' : '0'
+            }}
+          >
+            {m.content}
+          </div>
             {m.citations && m.citations.length > 0 && (
               <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {[...new Map(
@@ -51,7 +67,8 @@ export default function Chat() {
                       padding: '4px 8px',
                       borderRadius: 6,
                       background: '#f3f3f3',
-                      fontSize: 12
+                      fontSize: 14,
+                      cursor: 'pointer'
                     }}
                   >
                     {c.title}
@@ -77,7 +94,7 @@ export default function Chat() {
       <div style={{display:'flex', gap:8}}>
         <input placeholder="Ask about policy or products..." value={q} onChange={e=>setQ(e.target.value)} style={{flex:1, padding:10, borderRadius:8, border:'1px solid #ddd'}} onKeyDown={(e)=>{ if(e.key==='Enter') send(); }}/>
         <button onClick={send} disabled={loading} style={{padding:'10px 14px', borderRadius:8, border:'1px solid #111', background:'#111', color:'#fff'}}>
-          {loading ? 'Thinking...' : 'Send'}
+          {loading ? 'Thinking… 🤖' : 'Send'}
         </button>
       </div>
     </div>

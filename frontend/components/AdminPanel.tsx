@@ -15,6 +15,7 @@ export default function AdminPanel() {
     setBusy(true);
     try {
       await apiIngest();
+      alert("Documents indexed successfully ✅");
       await refresh();
     } finally {
       setBusy(false);
@@ -34,7 +35,10 @@ export default function AdminPanel() {
       </div>
       {metrics && (
         <div className="code">
-          <pre>{JSON.stringify(metrics, null, 2)}</pre>
+          <div>Docs: {metrics.total_docs}</div>
+          <div>Chunks: {metrics.total_chunks}</div>
+          <div>Retrieval: {metrics.avg_retrieval_latency_ms} ms</div>
+          <div>Generation: {metrics.avg_generation_latency_ms} ms</div>
         </div>
       )}
     </div>
